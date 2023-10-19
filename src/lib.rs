@@ -433,6 +433,104 @@ impl Version {
         Version::from_str(text)
     }
 
+    /// Add a [Prerelease] to the existing version.
+    ///
+    /// This will overwrite the existing [Prerelease] field of this [Version] instance.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use semver::{Version, Prerelease};
+    /// let req = Version::parse("1.2.3-alpha+ab56").unwrap();
+    /// let mut version = Version::parse("1.2.3+ab56").unwrap();
+    /// version.with_prerelease(Prerelease::new("alpha").unwrap());
+    /// assert!(req.eq(&version));
+    /// ```
+    pub fn with_prerelease(&mut self, pre: Prerelease) {
+        self.pre = pre;
+    }
+
+    /// Add a [BuildMetadata] to the existing version.
+    ///
+    /// This will overwrite the existing [BuildMetadata] of this [Version] instance.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use semver::{Version, BuildMetadata};
+    /// let req = Version::parse("1.2.3-alpha+5678abcd").unwrap();
+    /// let mut version = Version::parse("1.2.3-alpha").unwrap();
+    /// version.with_build(BuildMetadata::new("5678abcd").unwrap());
+    /// assert!(req.eq(&version));
+    /// ```
+    pub fn with_build(&mut self, build: BuildMetadata) {
+        self.build = build;
+    }
+
+    /// Increment the major version of this [Version] instance.
+    ///
+    /// This will reset the minor and patch versions of this [Version] instance to 0, will reset the prerelease
+    /// field to [Prerelease::EMPTY], and will reset the build field to [BuildMetadata::EMPTY].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use semver::Version;
+    /// let req = Version::parse("2.0.0").unwrap();
+    /// let mut version = Version::parse("1.2.3-alpha+123abc").unwrap();
+    /// version.increment_major_version(1);
+    /// assert!(req.eq(&version));
+    /// ```
+    pub fn increment_major_version(&mut self, number_of_increments: u64) {
+        self.major += number_of_increments;
+        self.minor = 0;
+        self.patch = 0;
+        self.pre = Prerelease::EMPTY;
+        self.build = BuildMetadata::EMPTY;
+    }
+
+    /// Increment the minor version of this [Version] instance.
+    ///
+    /// This will not affect the major version of this [Version] instance, but will reset the patch version to 0.
+    /// This will also reset the prerelease field to [Prerelease::EMPTY], and will reset the build field to
+    /// [BuildMetadata::EMPTY].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use semver::Version;
+    /// let req = Version::parse("1.3.0").unwrap();
+    /// let mut version = Version::parse("1.2.3-alpha+123abc").unwrap();
+    /// version.increment_minor_version(1);
+    /// assert!(req.eq(&version));
+    /// ```
+    pub fn increment_minor_version(&mut self, number_of_increments: u64) {
+        self.minor += number_of_increments;
+        self.patch = 0;
+        self.pre = Prerelease::EMPTY;
+        self.build = BuildMetadata::EMPTY;
+    }
+
+    /// Increment the patch version of this [Version] instance.
+    ///
+    /// This will not affect the major or minor versions of this [Version] instance, but will reset the
+    /// prerelease field to [Prerelease::EMPTY], and will reset the build field to [BuildMetadata::EMPTY].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use semver::Version;
+    /// let req = Version::parse("1.2.4").unwrap();
+    /// let mut version = Version::parse("1.2.3-alpha+123abc").unwrap();
+    /// version.increment_patch_version(1);
+    /// assert!(req.eq(&version));
+    /// ```
+    pub fn increment_patch_version(&mut self, number_of_increments: u64) {
+        self.patch += number_of_increments;
+        self.pre = Prerelease::EMPTY;
+        self.build = BuildMetadata::EMPTY;
+    }
+
     /// Compare the major, minor, patch, and pre-release value of two versions,
     /// disregarding build metadata. Versions that differ only in build metadata
     /// are considered equal. This comparison is what the SemVer spec refers to

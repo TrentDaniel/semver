@@ -248,3 +248,43 @@ fn test_align() {
     assert_eq!("*****1.2.3-rc1******", format!("{:*^20}", version));
     assert_eq!("           1.2.3-rc1", format!("{:>20}", version));
 }
+
+#[test]
+fn test_with_prerelease() {
+    let req = Version::parse("1.2.3-alpha+ab56").unwrap();
+    let mut version = Version::parse("1.2.3+ab56").unwrap();
+    version.with_prerelease(Prerelease::new("alpha").unwrap());
+    assert!(req.eq(&version));
+}
+
+#[test]
+fn test_with_build() {
+    let req = Version::parse("1.2.3-alpha+ab56").unwrap();
+    let mut version = Version::parse("1.2.3-alpha").unwrap();
+    version.with_build(BuildMetadata::new("ab56").unwrap());
+    assert!(req.eq(&version));
+}
+
+#[test]
+fn test_increment_major_version() {
+    let req = Version::parse("2.0.0").unwrap();
+    let mut version = Version::parse("1.2.3-alpha+123abc").unwrap();
+    version.increment_major_version(1);
+    assert!(req.eq(&version));
+}
+
+#[test]
+fn test_increment_minor_version() {
+    let req = Version::parse("1.3.0").unwrap();
+    let mut version = Version::parse("1.2.3-alpha+123abc").unwrap();
+    version.increment_minor_version(1);
+    assert!(req.eq(&version));
+}
+
+#[test]
+fn test_increment_patch_version() {
+    let req = Version::parse("1.2.4").unwrap();
+    let mut version = Version::parse("1.2.3-alpha+123abc").unwrap();
+    version.increment_patch_version(1);
+    assert!(req.eq(&version));
+}
